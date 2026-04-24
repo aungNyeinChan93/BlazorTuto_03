@@ -17,7 +17,7 @@
 <QuickGrid Class="table" Items="context.Student">
     <PropertyColumn Property="student => student.Name" />
     <PropertyColumn Property="student => student.Age" />
-    <PropertyColumn Property="student => student.Birthday" />
+    <PropertyColumn Property="student => student.Birthday" Format="dd/mm/yyyy" Title="Date Of Birth" />
 
     <TemplateColumn Context="student">
         <a href="@($"students/edit?studentid={student.StudentId}")">Edit</a> |

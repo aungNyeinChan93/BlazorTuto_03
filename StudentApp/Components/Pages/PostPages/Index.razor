@@ -14,24 +14,37 @@
     <a href="posts/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="context.Post">
+@* <QuickGrid Class="table" Items="posts">
     <PropertyColumn Property="post => post.Name" />
     <PropertyColumn Property="post => post.Description" />
     <PropertyColumn Property="post => post.userId" />
+    <PropertyColumn Property="post => post.User.Name" />
 
     <TemplateColumn Context="post">
         <a href="@($"posts/edit?postid={post.PostId}")">Edit</a> |
         <a href="@($"posts/details?postid={post.PostId}")">Details</a> |
         <a href="@($"posts/delete?postid={post.PostId}")">Delete</a>
     </TemplateColumn>
-</QuickGrid>
+</QuickGrid> *@
+
+@foreach (var post in posts)
+{
+    <div class="card p-2 bg-info my-2" @key="post.PostId">
+        <p> Name : @post.Name </p>
+        <p> Description : @post.Description </p>
+        <p> Author : @post.User.Name </p>
+    </div>
+}
 
 @code {
     private StudentAppContext context = default!;
 
-    protected override void OnInitialized()
+    public List<Post>? posts { get; set; }
+
+        protected override void OnInitialized()
     {
         context = DbFactory.CreateDbContext();
+        posts = context.Post.AsNoTracking().Include(p => p.User).ToList();
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
