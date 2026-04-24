@@ -16,5 +16,6 @@ namespace StudentApp.Data
 
         public DbSet<StudentApp.Models.Student> Student { get; set; } = default!;
         public DbSet<StudentApp.Models.User> User { get; set; } = default!;
+        public DbSet<StudentApp.Models.Post> Post { get; set; } = default!;
     }
 }

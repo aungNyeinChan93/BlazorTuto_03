@@ -1,0 +1,38 @@
+﻿@page "/posts"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using StudentApp.Models
+@using StudentApp.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<StudentApp.Data.StudentAppContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="posts/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Post">
+    <PropertyColumn Property="post => post.Name" />
+    <PropertyColumn Property="post => post.Description" />
+    <PropertyColumn Property="post => post.userId" />
+
+    <TemplateColumn Context="post">
+        <a href="@($"posts/edit?postid={post.PostId}")">Edit</a> |
+        <a href="@($"posts/details?postid={post.PostId}")">Details</a> |
+        <a href="@($"posts/delete?postid={post.PostId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private StudentAppContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

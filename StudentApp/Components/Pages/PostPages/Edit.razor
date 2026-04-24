@@ -1,0 +1,100 @@
+﻿@page "/posts/edit"
+@using Microsoft.EntityFrameworkCore
+@using StudentApp.Models
+@inject IDbContextFactory<StudentApp.Data.StudentAppContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Post</h2>
+<hr />
+@if (Post is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Post" OnValidSubmit="UpdatePost" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Post.PostId" value="@Post.PostId" />
+                <div class="mb-3">
+                <span class="text-danger">*</span>
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText id="name" @bind-Value="Post.Name" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Post.Name" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <InputText id="description" @bind-Value="Post.Description" class="form-control" />
+                    <ValidationMessage For="() => Post.Description" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="userid" class="form-label">userId:</label>
+                    <InputNumber id="userid" @bind-Value="Post.userId" class="form-control" />
+                    <ValidationMessage For="() => Post.userId" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/posts">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int PostId { get; set; }
+
+    [SupplyParameterFromForm]
+    private Post? Post { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Post ??= await context.Post.FirstOrDefaultAsync(m => m.PostId == PostId);
+
+        if (Post is null)
+        {
+            NavigationManager.NotFound();
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdatePost()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Post!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!PostExists(Post!.PostId))
+            {
+                NavigationManager.NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/posts");
+    }
+
+    private bool PostExists(int postid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Post.Any(e => e.PostId == postid);
+    }
+}

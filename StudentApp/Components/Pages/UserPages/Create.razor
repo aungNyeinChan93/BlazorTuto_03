@@ -43,7 +43,7 @@
     [SupplyParameterFromForm]
     private User User { get; set; } = default!;
 
-    protected override void OnInitialized() => User ??= new();
+    // protected override void OnInitialized() => User ??= new();
 
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddUser()
